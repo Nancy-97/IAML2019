@@ -35,7 +35,7 @@
 %   IMPORTANT: Specify your Student ID below [You will need to uncomment the line, 
 %	else compilation will fail]. Make sure to specify your student ID correctly, otherwise
 %   we may not be able to identify your work an dyou will be marked as missing.
-\newcommand{\assignmentAuthorName}{s1234567}
+\newcommand{\assignmentAuthorName}{s1932463}
 %--------------------------------------------------------
 
 \begin{document}
@@ -97,12 +97,12 @@ The following are links to Gradescope's own instructions for using the system an
 \end{enumerate}
 
 \answer[10em]{\textbf{Answer Box (1.)}:\\%
-    % Fill in this box with your answer to part 1
+    We assume that x1,…,xd are conditionally independent given y.
 }
 
 
 \answer[15em]{\textbf{Answer Box (2.)}:\\%
-    % Fill in this box with your answer to part 1
+    The main issue is how to compute P(x1…xd|y) for every x1,…,xd.
 }
 
 \subsubsection*{Question 2.6 (3 points)}
@@ -112,15 +112,13 @@ The following are links to Gradescope's own instructions for using the system an
 
 \answer[15em]{\textbf{Answer Box (1.)}:\\%
     % Fill in this box with your answer to part 1
+    The matrix describes the true positive and true negative are both 1 with the else two are both 0. 
 }
 
 
 % \answer[15em]{\textbf{Answer Box (2.)}:\\%
 %     % Fill in this box with your answer to part 2
-%     \begin{lstlisting}[breaklines=true]
-%         import os;
-%         example = "code";
-%     \end{lstlisting}
+I think it may be wrong because the true negative shouldn't so high with true positive is high enough, and the modle cannot be so good that true positive reaches 1.
 % }
 
 
@@ -142,22 +140,61 @@ In class we discussed ways of preprocessing features to improve performance in s
 
 \begin{code}{Answer Box (1.)}{25em}
     Enter your code for part 1 here.
+import os
+import pandas as pd
+import utils.plotter as scatter
+import numpy as np
+import matplotlib.pyplot as plt
 
-    import python;
-    example = 'code';
+data_path = os.path.join(os.getcwd(), 'datasets', 'train_auto_numeric.csv')
+auto_numeric = pd.read_csv(data_path, delimiter = ',')
+
+engine_size=auto_numeric['engine-size']
+
+engine_size_max = engine_size.max()
+engine_size_min = engine_size.min()
+trans_engine_size = (engine_size - engine_size_min)/(engine_size_max - engine_size_min)
+
+#print(engine_size)
+n = engine_size.count()
+x = range(1,n+1)
+print(trans_engine_size)
+
+plt.scatter(x,trans_engine_size)
+plt.show()
+
 \end{code}
 
 
 \begin{code}{Answer Box (2.)}{25em}
     Enter your code for part 2 here.
+    
+from sklearn.linear_model import LinearRegression
+import numpy as np
+from sklearn.model_selection import KFold
+from sklearn import metrics
 
-    import python;
-    example = 'code';
+x = np.array(x).reshape(-1,1)
+y = np.array(trans_engine_size)
+
+kf = KFold(n_splits=3)
+
+for train_index, test_index in kf.split(x):
+    print("TRAIN:", train_index, "\nTEST:", test_index)
+    x_train, x_test = x[train_index], x[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    model = LinearRegression()
+    model.fit(x_train,y_train)
+    y_new = model.predict(x_test)
+    RMSE = np.sqrt(metrics.mean_squared_error(y_new,y_test))
+    #r_sq = model.score(x_test,y_test)
+    print('RMSE:', RMSE)
+    
 \end{code}
 
 
 \answer[15em]{\textbf{Answer Box (3.)}:\\%
-    % Fill in this box with your answer to part 2
+    The results seem to be more uniform than before because the attribute has been transformed into an interval so the distribution is more visible.
 }
 
 
@@ -173,20 +210,76 @@ The simplicity of Linear Regression allows us to interpret the importance of cer
 \end{enumerate}
 
 \answer[15em]{\textbf{Answer Box (1.)}:\\%
-    % Fill in this box with your answer to part 1
+    The reason is that all attributes are treated equally, it is not fair for the attributes which counts more for the model. We can add different weights for each attributes so their importance can be compared easily.
 }
 
 
 \begin{code}{Answer Box (2.)}{25em}
     Enter your code for part 2 here.
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+import os
+import pandas as pd
 
-    import python;
-    example = 'code';
+def linear_weight(testPoint,xArray,yArray,k=1):
+    # read the data and form the matrix
+    xMat = np.mat(xArray);   yMat = np.mat(yArray).T
+    m = np.shape(xMat)[0]
+    # create the matrix for weights
+    weights = np.mat(np.eye((m)))
+
+    for j in range(m):  
+        diffMat = testPoint - xMat[j,:]
+        weights[j,j] = math.exp(diffMat*diffMat.T/(-2.0*k**2))
+    xTx = xMat.T * (weights * xMat)  
+    if np.linalg.det(xTx) == 0.0:
+        print ("The matrix cann't be inversed")
+        return
+    ws = xTx.I * (xMat.T * (weights * yMat))
+    return testPoint * ws
+
+#local weighted
+def linear_weight_test(testArray,xArray,yArray,k=1):
+    testshape = np.shape(testArray)[0]
+    yHat = np.zeros(testshape)
+    for i in range(testshape): 
+        yHat[i] = linear_weight(testArray[i],xArray,yArray,k)
+    return yHat
+
+#load data for local weighting
+def dataload():
+    dataMat=[]
+    labelMat=[]
+    fr = open(r'D:\课程信息\IAML\assessment\datasets\train_auto_numeric.txt')
+    for line in fr.readlines():
+        lineArray=line.strip().split()
+        dataMat.append([1.0, float(lineArray[0]), float(lineArray[1])])
+        labelMat.append(float(lineArray[2]))
+    return dataMat,labelMat
+
+# load the data & calculate local weight
+xArray, yArray = dataload()
+yHat = linear_weight_test(xArray, xArray, yArray, 1)
+xMat = np.mat(xArray)
+yMat = np.mat(yArray)
+sort_index = xMat[:,1].argsort(0)
+xSort = xMat[sort_index][:,0,:]
+
+#create the plot for training
+fig = plt.figure()
+ax = fig.add_subplot(131)
+ax.plot(xSort[:,1],yHat1[sort_index])
+ax.scatter(xMat[:,1].flatten().A[0],np.mat(yArr).T.flatten().A[0],)
+plt.title('k=1')
+plt.show()
+
 \end{code}
 
 
 \answer[15em]{\textbf{Answer Box (3.)}:\\%
-    % Fill in this box with your answer to part 2
+    engine_size, price and compression-ratio
+
 }
 
 
