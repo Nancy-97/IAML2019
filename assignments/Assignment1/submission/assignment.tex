@@ -111,12 +111,12 @@ The following are links to Gradescope's own instructions for using the system an
 
 
 \answer[15em]{\textbf{Answer Box (1.)}:\\%
-    The matrix describes the true positive and true negative are both 1 with the else two are both 0. 
+    The matrix describes the true positive and true negative are both 1 with the else two are both 0. I think it may be wrong because the true negative shouldn't so high with true positive is high enough, and the modle cannot be so good that true positive reaches 1.
 }
 
 
 % \answer[15em]{\textbf{Answer Box (2.)}:\\%
-  I think it may be wrong because the true negative shouldn't so high with true positive is high enough, and the modle cannot be so good that true positive reaches 1.
+  
 % }
 
 
@@ -137,7 +137,6 @@ In class we discussed ways of preprocessing features to improve performance in s
 \end{enumerate}
 
 \begin{code}{Answer Box (1.)}{25em}
-    Enter your code for part 1 here.
 import os
 import pandas as pd
 import utils.plotter as scatter
@@ -165,8 +164,6 @@ plt.show()
 
 
 \begin{code}{Answer Box (2.)}{25em}
-    Enter your code for part 2 here.
-    
 from sklearn.linear_model import LinearRegression
 import numpy as np
 from sklearn.model_selection import KFold
@@ -187,7 +184,6 @@ for train_index, test_index in kf.split(x):
     RMSE = np.sqrt(metrics.mean_squared_error(y_new,y_test))
     #r_sq = model.score(x_test,y_test)
     print('RMSE:', RMSE)
-    
 \end{code}
 
 
@@ -213,7 +209,6 @@ The simplicity of Linear Regression allows us to interpret the importance of cer
 
 
 \begin{code}{Answer Box (2.)}{25em}
-    Enter your code for part 2 here.
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -271,16 +266,14 @@ ax.plot(xSort[:,1],yHat1[sort_index])
 ax.scatter(xMat[:,1].flatten().A[0],np.mat(yArr).T.flatten().A[0],)
 plt.title('k=1')
 plt.show()
-
 \end{code}
 
 
 \answer[15em]{\textbf{Answer Box (3.)}:\\%
-    engine_size, engine_power and mean-effective-pressure
-
-
+    engine_size
+    engine_power
+    mean-effective-pressure
 }
-
 
 %============================================================================%
 
