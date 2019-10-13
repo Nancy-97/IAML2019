@@ -137,6 +137,7 @@ In class we discussed ways of preprocessing features to improve performance in s
 \end{enumerate}
 
 \begin{code}{Answer Box (1.)}{25em}
+
 import os
 import pandas as pd
 import utils.plotter as scatter
@@ -145,9 +146,7 @@ import matplotlib.pyplot as plt
 
 data_path = os.path.join(os.getcwd(), 'datasets', 'train_auto_numeric.csv')
 auto_numeric = pd.read_csv(data_path, delimiter = ',')
-
 engine_size=auto_numeric['engine-size']
-
 engine_size_max = engine_size.max()
 engine_size_min = engine_size.min()
 trans_engine_size = (engine_size - engine_size_min)/(engine_size_max - engine_size_min)
@@ -156,7 +155,6 @@ trans_engine_size = (engine_size - engine_size_min)/(engine_size_max - engine_si
 n = engine_size.count()
 x = range(1,n+1)
 print(trans_engine_size)
-
 plt.scatter(x,trans_engine_size)
 plt.show()
 
